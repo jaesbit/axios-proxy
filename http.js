@@ -140,7 +140,8 @@ function setup(timeout = 10000, interval = 50, threads = 30, proxyfiles = [], pr
         proxyuser: proxyuser,
         proxypass: proxypass,
         nocert: nocert,
-        debugproxy: debugproxy
+        debugproxy: debugproxy,
+        proxyArgs: {}
     }
     initializeWithArgs();
 }

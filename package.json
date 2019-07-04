@@ -1,6 +1,6 @@
 {
   "name": "axios-proxy",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Easy axios interface with proxy socks5 support by default",
   "main": "http.js",
   "scripts": {

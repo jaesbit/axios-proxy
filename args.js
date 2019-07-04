@@ -33,3 +33,4 @@ const proxyOptions = [
 ];
 
 module.exports = parseArgs(proxyOptions, { partial: true });
+module.exports.proxyArgs = proxyOptions;
