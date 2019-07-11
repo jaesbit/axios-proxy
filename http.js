@@ -56,15 +56,13 @@ function requestInterceptor(config) {
                 const agent = selectAgent();
                 if (agent) {
                     if (options.debugproxy) {
-                        if (agent) {
-                            console.log(`Switched to agent ${agent.proxy.host}`);
-                        }
-                        else {
-                            console.warn("switch agent but undefinded found!");
-                        }
+                        console.log(`Switched to agent ${agent.proxy.host}`);
                     }
                     config.httpsAgent = agent;
                     config.httpAgent = agent;
+                }
+                else {
+                    console.warn("switch agent but undefinded found!");
                 }
                 resolve(config);
             }
@@ -90,8 +88,8 @@ function responseSuccessInterceptor(response) {
  */
 function responseErrorInterceptor(error) {
     PENDING_REQUESTS = Math.max(0, PENDING_REQUESTS - 1);
+    unselectAgent(error.config.httpsAgent);
     if (error.message.indexOf("timeout") >= 0) {
-        unselectAgent(error.config.httpsAgent);
         error.config.timeout = error.config.timeout * 2;
         if (options.debugproxy) { console.log(`increased timeout to ${error.config.timeout}`); }
         return innerClient.request(error.config);
@@ -132,7 +130,7 @@ function create(options) {
  * @param {Boolean} debugproxy Enables verbose mode for proxy messages
  */
 function setup(timeout = 10000, interval = 50, threads = 30, proxyfiles = [], proxyuser = "", proxypass = "", nocert = false, debugproxy = false) {
-    options =  {
+    options = {
         timeout: timeout,
         interval: interval,
         threads: threads,
