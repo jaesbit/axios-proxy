@@ -61,7 +61,7 @@ function requestInterceptor(config) {
                     config.httpsAgent = agent;
                     config.httpAgent = agent;
                 }
-                else {
+                else if(proxy.active){
                     console.warn("switch agent but undefinded found!");
                 }
                 resolve(config);
@@ -111,7 +111,7 @@ function responseErrorInterceptor(error) {
  * 
  */
 function create(options) {
-    const newClient = axios.create(options);
+    const newClient = this.instance(options);
     newClient.interceptors.request.use(requestInterceptor);
     newClient.interceptors.response.use(responseSuccessInterceptor, responseErrorInterceptor);
     newClient.download = download;
@@ -199,6 +199,7 @@ async function download(url, path) {
 axios.interceptors.request.use(requestInterceptor);
 axios.interceptors.response.use(responseSuccessInterceptor, responseErrorInterceptor);
 axios.download = download;
+axios.instance = axios.create;
 
 let PENDING_REQUESTS = 0
 let proxy = {
