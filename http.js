@@ -114,6 +114,7 @@ function create(options) {
     const newClient = axios.create(options);
     newClient.interceptors.request.use(requestInterceptor);
     newClient.interceptors.response.use(responseSuccessInterceptor, responseErrorInterceptor);
+    newClient.download = download;
     return newClient;
 }
 
@@ -171,7 +172,34 @@ function initializeWithArgs() {
     }
 }
 
-const innerClient = create();
+/**
+ * Download given url into file path
+ * 
+ * @param {String} url Url to download into file
+ * @param {String} path Path to write Url file
+ */
+async function download(url, path) {
+    const writer = fs.createWriteStream(path)
+
+    const response = await axios({
+        url,
+        method: 'GET',
+        responseType: 'stream'
+    })
+
+    response.data.pipe(writer)
+
+    return new Promise((resolve, reject) => {
+        writer.on('finish', resolve)
+        writer.on('error', reject)
+    })
+}
+
+// Add axios default interceptors
+axios.interceptors.request.use(requestInterceptor);
+axios.interceptors.response.use(responseSuccessInterceptor, responseErrorInterceptor);
+axios.download = download;
+
 let PENDING_REQUESTS = 0
 let proxy = {
     available: [],
@@ -193,7 +221,7 @@ try {
  * Basically the module gives all functionallity of an axios instance with interceptors
  * Or gives you way to create your custom instance by calling self.create()
  */
-module.exports = innerClient;
+module.exports = axios;
 module.exports.create = create;
 module.exports.options = options;
 module.exports.setup = setup;
