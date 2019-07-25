@@ -92,7 +92,7 @@ function responseErrorInterceptor(error) {
     if (error.message.indexOf("timeout") >= 0) {
         error.config.timeout = error.config.timeout * 2;
         if (options.debugproxy) { console.log(`increased timeout to ${error.config.timeout}`); }
-        return innerClient.request(error.config);
+        return axios.request(error.config);
     } else {
         return new Promise((res, rej) => {
             if (!error.response) {
