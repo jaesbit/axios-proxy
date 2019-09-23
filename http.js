@@ -226,6 +226,7 @@ try {
     }
 }
 
+const {version} = require("./package");
 /**
  * Basically the module gives all functionallity of an axios instance with interceptors
  * Or gives you way to create your custom instance by calling self.create()
@@ -237,3 +238,4 @@ module.exports.setup = setup;
 module.exports.disableHelp= ()=>{
     options.options = [];
 }
+module.exports.version = version;
