@@ -61,7 +61,7 @@ function requestInterceptor(config) {
                     config.httpsAgent = agent;
                     config.httpAgent = agent;
                 }
-                else if(proxy.active){
+                else if (proxy.active) {
                     console.warn("switch agent but undefinded found!");
                 }
                 resolve(config);
@@ -211,11 +211,19 @@ let options = {};
 
 try {
     // If command-line-args is available will setup proxy with args
-    const _ = require.resolve("command-line-args");
+    const _ = require.resolve("commander");
     options = require("./args");
     initializeWithArgs();
+
 } catch (error) {
-    console.warn("command-line-args not available, requires self.setup({}) to initialize");
+    try {
+        // If command-line-args is available will setup proxy with args
+        const _ = require.resolve("command-line-args");
+        options = require("./old_args");
+        console.warn("@command-line-args is depcreated now works with @commander")
+        initializeWithArgs();
+    } catch (error) {
+    }
 }
 
 /**
