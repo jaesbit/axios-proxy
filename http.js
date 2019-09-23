@@ -234,3 +234,6 @@ module.exports = axios;
 module.exports.create = create;
 module.exports.options = options;
 module.exports.setup = setup;
+module.exports.disableHelp= ()=>{
+    options.options = [];
+}
