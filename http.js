@@ -207,7 +207,13 @@ let proxy = {
     working: [],
     active: false
 }
-let options = {};
+let options = {
+    timeout: 10000,
+    interval: 50,
+    threads: 30,
+    nocert: false,
+    debugproxy: false
+};
 
 try {
     // If command-line-args is available will setup proxy with args
@@ -222,7 +228,7 @@ try {
         options = require("./old_args");
         console.warn("@command-line-args is depcreated now works with @commander")
         initializeWithArgs();
-    } catch (error) {
+    } catch (error) {    
     }
 }
 
