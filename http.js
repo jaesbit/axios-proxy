@@ -217,19 +217,11 @@ let options = {
 
 try {
     // If command-line-args is available will setup proxy with args
-    const _ = require.resolve("commander");
-    options = require("./args");
+    const _ = require.resolve("command-line-args");
+    options = require("./old_args");
+    console.warn("@command-line-args is depcreated now works with @commander")
     initializeWithArgs();
-
 } catch (error) {
-    try {
-        // If command-line-args is available will setup proxy with args
-        const _ = require.resolve("command-line-args");
-        options = require("./old_args");
-        console.warn("@command-line-args is depcreated now works with @commander")
-        initializeWithArgs();
-    } catch (error) {
-    }
 }
 
 const { version } = require("./package");
@@ -241,7 +233,8 @@ module.exports = axios;
 module.exports.create = create;
 module.exports.options = options;
 module.exports.setup = setup;
-module.exports.disableHelp = () => {
-    options.options = [];
+module.exports.enableCommander = () => {
+    options = require("./args");
+    initializeWithArgs();
 }
 module.exports.version = version;
