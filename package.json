@@ -22,7 +22,7 @@
   },
   "homepage": "https://github.com/jaesbit/axios-proxy#readme",
   "dependencies": {
-    "axios": "^0.19.0",
-    "socks-proxy-agent": "^4.0.2"
+    "axios": "^0.21.1",
+    "socks-proxy-agent": "^5.0.0"
   }
 }
