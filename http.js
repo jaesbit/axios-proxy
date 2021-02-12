@@ -89,19 +89,19 @@ function responseSuccessInterceptor(response) {
 function responseErrorInterceptor(error) {
     PENDING_REQUESTS = Math.max(0, PENDING_REQUESTS - 1);
     unselectAgent(error.config.httpsAgent);
-    if (error.message.indexOf("timeout") >= 0) {
-        error.config.timeout = error.config.timeout * 2;
-        if (options.debugproxy) { console.log(`increased timeout to ${error.config.timeout}`); }
-        return axios.request(error.config);
-    } else {
-        return new Promise((res, rej) => {
-            if (!error.response) {
-                rej(error);
-            } else {
-                res(error.response);
-            }
-        })
-    }
+    // if (error.message.indexOf("timeout") >= 0) {
+    //     error.config.timeout = error.config.timeout * 2;
+    //     if (options.debugproxy) { console.log(`increased timeout to ${error.config.timeout}`); }
+    //     return axios.request(error.config);
+    // } else {
+    return new Promise((res, rej) => {
+        if (!error.response) {
+            rej(error);
+        } else {
+            res(error.response);
+        }
+    })
+    // }
 }
 
 /**
@@ -207,26 +207,24 @@ let proxy = {
     working: [],
     active: false
 }
-let options = {};
+let options = {
+    timeout: 10000,
+    interval: 50,
+    threads: 30,
+    nocert: false,
+    debugproxy: false
+};
 
 try {
     // If command-line-args is available will setup proxy with args
-    const _ = require.resolve("commander");
-    options = require("./args");
+    const _ = require.resolve("command-line-args");
+    options = require("./old_args");
+    console.warn("@command-line-args is depcreated now works with @commander")
     initializeWithArgs();
-
 } catch (error) {
-    try {
-        // If command-line-args is available will setup proxy with args
-        const _ = require.resolve("command-line-args");
-        options = require("./old_args");
-        console.warn("@command-line-args is depcreated now works with @commander")
-        initializeWithArgs();
-    } catch (error) {
-    }
 }
 
-const {version} = require("./package");
+const { version } = require("./package");
 /**
  * Basically the module gives all functionallity of an axios instance with interceptors
  * Or gives you way to create your custom instance by calling self.create()
@@ -235,7 +233,8 @@ module.exports = axios;
 module.exports.create = create;
 module.exports.options = options;
 module.exports.setup = setup;
-module.exports.disableHelp= ()=>{
-    options.options = [];
+module.exports.enableCommander = () => {
+    options = require("./args");
+    initializeWithArgs();
 }
 module.exports.version = version;
