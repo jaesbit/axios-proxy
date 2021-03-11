@@ -44,6 +44,18 @@ function unselectAgent (agent) {
 }
 
 /**
+ * Disables agent usually corrupted or down
+ * @param {SocksProxyAgent} agent Speficy an agent to mark as usable again to be available on selectAgent()
+ */
+function disableAgent (agent) {
+  const index = proxy.available.indexOf(agent)
+  if (index >= 0) { proxy.available.splice(index, 1) }
+  if (options.threads === proxy.available.length + proxy.active.length - 1) {
+    options.threads--
+  }
+}
+
+/**
  * Interceptor for axios request
  * Before execute request will active any available proxy if it`s configured
  */
@@ -52,8 +64,11 @@ function requestInterceptor (config) {
     const interval = setInterval(() => {
       if (PENDING_REQUESTS < options.threads && (!proxy.active || proxy.available.length > 0)) {
         PENDING_REQUESTS++
-        clearInterval(interval)
         const agent = selectAgent()
+        if (proxy.active && !agent) {
+          return
+        }
+        clearInterval(interval)
         if (agent) {
           if (options.debugproxy) {
             console.log(`Switched to agent ${agent.proxy.host}`)
@@ -91,7 +106,18 @@ function responseErrorInterceptor (error) {
   unselectAgent(error.config.httpsAgent)
   return new Promise((resolve, reject) => {
     if (!error.response) {
-      reject(error)
+      if (error.message.includes('ECONNREFUSED')) {
+        console.warn(`Proxy not working ${error.config.httpsAgent.proxy.host}`)
+        disableAgent(error.config.httpsAgent)
+        if (proxy.available.length) {
+          console.warn('Trying to select new proxy')
+          axios(error.config).then(x => resolve(x))
+        } else {
+          reject(error)
+        }
+      } else {
+        reject(error)
+      }
     } else {
       resolve(error.response)
     }
