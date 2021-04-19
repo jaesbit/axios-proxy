@@ -2,6 +2,7 @@ const axios = require('axios')
 const fs = require('fs')
 const SocksProxyAgent = require('socks-proxy-agent')
 
+
 /**
  * Generate random number between low and high
  * @param {Number} low Low rage to generate random value
@@ -19,9 +20,20 @@ function random (low, high) {
  */
 function selectAgent () {
   if (proxy.active) {
-    const index = random(0, proxy.available.length - 1)
-    const agent = proxy.available[index]
-    proxy.available.splice(index, 1)
+    let agent = undefined
+    if(proxy.disabled.length){
+      const disableds = proxy.disabled.filter(x=> x.date - new Date() > 5 * 60 * 1000)
+      if(disableds.length){
+        const idx = proxy.disabled.indexOf([disableds[0]])
+        agent = proxy.disabled[idx].proxy
+        proxy.disabled.splice(idx, 1)
+      } 
+    }
+    if(!agent){
+      const index = random(0, proxy.available.length - 1)
+      agent = proxy.available[index]
+      proxy.available.splice(index, 1)
+    }
     proxy.working.push(agent)
     if (options.debugproxy && agent == undefined) {
       // I think is already fixed and will not raise this message any more
@@ -49,7 +61,13 @@ function unselectAgent (agent) {
  */
 function disableAgent (agent) {
   const index = proxy.available.indexOf(agent)
-  if (index >= 0) { proxy.available.splice(index, 1) }
+  if (index >= 0) { 
+    proxy.disabled.push({
+      proxy: proxy.available[index],
+      date: new Date()
+    })
+    proxy.available.splice(index, 1) 
+  }
   if (options.threads === proxy.available.length + proxy.active.length - 1) {
     options.threads--
   }
@@ -250,7 +268,8 @@ let PENDING_REQUESTS = 0
 const proxy = {
   available: [],
   working: [],
-  active: false
+  active: false,
+  disabled: []
 }
 let options = {
   timeout: 10000,
