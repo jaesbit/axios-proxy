@@ -152,6 +152,7 @@ function create (options) {
   newClient.interceptors.request.use(requestInterceptor)
   newClient.interceptors.response.use(responseSuccessInterceptor, responseErrorInterceptor)
   newClient.download = download
+  newClient.settings = options
   return newClient
 }
 
@@ -285,9 +286,9 @@ const { version } = require('./package')
  */
 module.exports = axios
 module.exports.create = create
-module.exports.initSettings = () => options
-module.exports.proxyPool = () => proxy
-
+// module.exports.options = options
+module.exports.initSettings = options
+module.exports.proxyPool = proxy
 module.exports.setup = setup
 module.exports.counter = () => { return global.executedRequests }
 module.exports.enableCommander = () => {
