@@ -2,7 +2,6 @@ const axios = require('axios')
 const fs = require('fs')
 const SocksProxyAgent = require('socks-proxy-agent')
 
-
 /**
  * Generate random number between low and high
  * @param {Number} low Low rage to generate random value
@@ -20,16 +19,16 @@ function random (low, high) {
  */
 function selectAgent () {
   if (proxy.active) {
-    let agent = undefined
-    if(proxy.disabled.length){
-      const disableds = proxy.disabled.filter(x=> x.date - new Date() > 5 * 60 * 1000)
-      if(disableds.length){
+    let agent
+    if (proxy.disabled.length) {
+      const disableds = proxy.disabled.filter(x => x.date - new Date() > 5 * 60 * 1000)
+      if (disableds.length) {
         const idx = proxy.disabled.indexOf([disableds[0]])
         agent = proxy.disabled[idx].proxy
         proxy.disabled.splice(idx, 1)
-      } 
+      }
     }
-    if(!agent){
+    if (!agent) {
       const index = random(0, proxy.available.length - 1)
       agent = proxy.available[index]
       proxy.available.splice(index, 1)
@@ -61,12 +60,12 @@ function unselectAgent (agent) {
  */
 function disableAgent (agent) {
   const index = proxy.available.indexOf(agent)
-  if (index >= 0) { 
+  if (index >= 0) {
     proxy.disabled.push({
       proxy: proxy.available[index],
       date: new Date()
     })
-    proxy.available.splice(index, 1) 
+    proxy.available.splice(index, 1)
   }
   if (options.threads === proxy.available.length + proxy.active.length - 1) {
     options.threads--
@@ -286,7 +285,9 @@ const { version } = require('./package')
  */
 module.exports = axios
 module.exports.create = create
-module.exports.options = options
+module.exports.initSettings = () => options
+module.exports.proxyPool = () => proxy
+
 module.exports.setup = setup
 module.exports.counter = () => { return global.executedRequests }
 module.exports.enableCommander = () => {
