@@ -14,7 +14,7 @@ function buildHostList(){
         if(str.length < 2){
             str = "0" + str
         }
-        hosts.push(process.env.PROXY_HOST.replace("XX", str))
+        hosts.push((process.env.PROXY_HOST || "").replace("XX", str))
     }
     return hosts
 }
