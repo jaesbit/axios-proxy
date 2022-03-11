@@ -25,5 +25,5 @@ cli.option('--timeout <ms>', 'maximum waiting time on requests', "10000")
     .option('--nocert', 'if set, will not check the certificate', false)
     .option('--debugproxy', 'prints verbose info', false)
 
-export const options: IOptions = cli.parse(process.argv)
+export const options: IOptions = cli.parse(process.argv) as any as IOptions
 
